@@ -17,9 +17,7 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.6.10"
-
+        
       - name: Verify terraform installed
         run: |
           echo "PATH=$PATH"
