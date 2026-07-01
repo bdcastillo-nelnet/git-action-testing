@@ -1,0 +1,37 @@
+name: Terraform Deploy
+
+on:
+  pull_request:      # validate proposed changes
+  push:
+    branches: [main] # apply once merged
+
+jobs:
+  terraform:
+    name: Validate & Deploy
+    runs-on: ubuntu-latest
+    environment: AWS
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.6"
+
+      - name: Validate
+        run: |
+          terraform init -input=false
+          terraform fmt -check
+          terraform validate
+
+      - name: Apply (main only)
+        if: github.event_name == 'push'
+        run: terraform apply -input=false -auto-approve
