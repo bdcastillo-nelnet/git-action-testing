@@ -1,11 +1,7 @@
-// Lambda handler: create a new user in the DynamoDB user_table.
-// Expects first_name and last_name; generates a user_id automatically.
-
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
 const { randomUUID } = require("crypto");
 
-// The SDK v3 clients are provided by the nodejs20.x Lambda runtime.
 const client = new DynamoDBClient({});
 const ddb = DynamoDBDocumentClient.from(client);
 
@@ -13,8 +9,7 @@ const TABLE_NAME = process.env.TABLE_NAME || "user_table";
 
 exports.handler = async (event) => {
   try {
-    // Works whether invoked directly (event = {...}) or via API Gateway
-    // (event.body is a JSON string).
+
     const input =
       typeof event.body === "string" ? JSON.parse(event.body) : event.body || event;
 

@@ -1,0 +1,60 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**" # only run when the frontend changes
+  workflow_dispatch: # allow manual runs
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-west-2
+  S3_BUCKET: david-website-bucket
+  CLOUDFRONT_DISTRIBUTION_ID: E3RCGTM9OP4SY0
+
+jobs:
+  deploy:
+    name: Build & Deploy Web
+    runs-on: ubuntu-latest
+    environment: AWS
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install & build
+        working-directory: web
+        env:
+          # Vite bakes these into the bundle at build time.
+          # Set them as environment variables on the "AWS" environment.
+          VITE_USERS_API_URL: ${{ vars.VITE_USERS_API_URL }}
+          VITE_CREATE_USER_API_URL: ${{ vars.VITE_CREATE_USER_API_URL }}
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync build output to S3
+        working-directory: web
+        run: aws s3 sync dist/ "s3://$S3_BUCKET" --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths "/*"
