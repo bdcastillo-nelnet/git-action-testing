@@ -17,27 +17,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        
-      - name: Verify terraform installed
-        run: |
-          echo "PATH=$PATH"
-          terraform -version || true
-          which terraform || true
-
-      - name: "fallback: install Terraform if missing"
-        run: |
-          if ! command -v terraform >/dev/null; then
-            echo "Terraform not found — ensuring unzip/wget are available"
-            sudo apt-get update -y || true
-            sudo apt-get install -y wget unzip || true
-            echo "Downloading Terraform v1.6.10"
-            wget -qO /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.6.10/terraform_1.6.10_linux_amd64.zip
-            sudo unzip -o /tmp/terraform.zip -d /usr/local/bin
-            sudo chmod +x /usr/local/bin/terraform || true
-            terraform version || true
-          else
-            echo "Terraform already installed"
-          fi
+        with:
+          terraform_version: 1.6.10
 
       - name: Terraform init
         run: terraform init -input=false
