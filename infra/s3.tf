@@ -7,8 +7,8 @@ resource "aws_s3_object" "index_html" {
   acl    = "private"
 
   key          = "index.html"
-  source       = "./web/index.html"
+  source       = "../web/index.html"
   content_type = "text/html; charset=utf-8"
 
-  etag = filemd5("./web/index.html")
+  etag = filemd5("../web/index.html")
 }

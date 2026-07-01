@@ -31,3 +31,39 @@ resource "aws_s3_bucket_policy" "david_website_bucket_policy" {
     ]
   })
 }
+
+resource "aws_iam_role" "create_user_lambda" {
+  name = "create_user_lambda_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Action    = "sts:AssumeRole"
+        Principal = { Service = "lambda.amazonaws.com" }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "create_user_policy" {
+  name = "create_user_dynamodb_write"
+  role = aws_iam_role.create_user_lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["dynamodb:PutItem"]
+        Resource = aws_dynamodb_table.user_table.arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
