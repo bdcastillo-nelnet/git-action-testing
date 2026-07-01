@@ -12,3 +12,13 @@ output "s3_bucket_regional_domain_name" {
   description = "The regional S3 bucket domain name used by CloudFront origin."
   value       = aws_s3_bucket.david_website_bucket.bucket_regional_domain_name
 }
+
+output "pull_users_url" {
+  description = "Public Function URL for listing users. Put this in web/.env as VITE_USERS_API_URL."
+  value       = aws_lambda_function_url.pull_users.function_url
+}
+
+output "create_user_url" {
+  description = "Public Function URL for creating a user. Put this in web/.env as VITE_CREATE_USER_API_URL."
+  value       = aws_lambda_function_url.create_user.function_url
+}

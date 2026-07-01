@@ -1,0 +1,20 @@
+{
+  "name": "lambda-dynamodb-user",
+  "version": "1.0.0",
+  "description": "Lambda functions for the user_table DynamoDB table",
+  "main": "src/lambdas/create_user.js",
+  "scripts": {
+    "test": "echo \"no tests yet\" && exit 0"
+  },
+  "keywords": [
+    "lambda",
+    "dynamodb",
+    "aws"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0"
+  }
+}
